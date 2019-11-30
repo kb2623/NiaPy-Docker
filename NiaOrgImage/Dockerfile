@@ -1,8 +1,9 @@
 ARG BASE_CONTAINER=pipenv:latest
 FROM $BASE_CONTAINER
 
+MAINTAINER Klemen Berkovic <roxor@gmail.com>
+
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
-LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL github="https://github.com/NiaOrg"
 LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
 LABEL description="Nature-inspired algorithms are a very popular tool for solving optimization problems. Numerous variants of nature-inspired algorithms have been developed since the beginning of their era. To prove their versatility, those were tested in various domains on various applications, especially when they are hybridized, modified or adapted. However, implementation of nature-inspired algorithms is sometimes a difficult, complex and tedious task. In order to break this wall, NiaPy is intended for simple and quick use, without spending time for implementing algorithms from scratch."
