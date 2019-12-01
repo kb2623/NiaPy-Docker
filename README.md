@@ -1,3 +1,4 @@
+<link href=".css/style.css" rel="stylesheet"></link>
 # NiaPy docker image
 <table width="100%" height="100%" align="center" valign="center" style="margin: 0 auto; border: none;">
    <tr>
