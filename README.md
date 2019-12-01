@@ -16,6 +16,8 @@
 </p>
 <p align="center">
 	<img src=".images/NiaPyLogo.png" alt="NiaPy logo" height="191" width="367" style="display: block; margin: 0 auto" />
+	<img src=".images/plus-sign-in-circle.svg" alt="In combination with" height="50" width="50" style="display: block; margin: 0 auto" />
+	<img src=".images/icon-slack.svg" alt="Docker logo" height="191" width="191" style="display: block; margin: 0 auto" />
 </p>
 
 # Instalation
