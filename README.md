@@ -3,16 +3,19 @@
    <table width="100%" height="100%" align="center" valign="center">
 	   <tr>
 		   <td>
-			   <img src=".images/NiaPyLogo.png" alt="NiaPy logo" height="191" width="367">
+			   <img src=".images/NiaPyLogo.png" alt="NiaPy logo" height="191" width="367"/>
 			 </td>
 			 <td>
-			   <img src=".images/plus-sign-in-circle.svg" alt="In combination with" height="50" width="50">
+			   <img src=".images/plus-sign-in-circle.svg" alt="In combination with" height="50" width="50"/>
 			 </td>
 			 <td>
-				 <img src=".images/icon-slack.svg" alt="Docker logo" height="191" width="191">
+				 <img src=".images/icon-slack.svg" alt="Docker logo" height="191" width="191"/>
 			 </td>
 		 </tr>
    </table>
+</p>
+<p align="center">
+	<img src=".images/NiaPyLogo.png" alt="NiaPy logo" height="191" width="367" style="display: block; margin: 0 auto" />
 </p>
 
 # Instalation
