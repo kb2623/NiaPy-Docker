@@ -1,5 +1,5 @@
 # NiaPy docker image
-<div>
+<p align="center"> 
    <table width="100%" height="100%" align="center" valign="center">
 	   <tr>
 		   <td>
@@ -13,7 +13,7 @@
 			 </td>
 		 </tr>
    </table>
-</div>
+</p>
 
 # Instalation
 Use make file with task in order:
