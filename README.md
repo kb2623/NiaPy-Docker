@@ -1,5 +1,5 @@
 # NiaPy docker image
-<div style="display: flex; align-items: center; justify-content: center;">
+<div style="display: block; margin-left: auto; margin-right: auto">
 	<img src=".images/NiaPyLogo.png" alt="NiaPy logo" height="191" width="367">
 	<img src=".images/plus-sign-in-circle.svg" alt="In combination with" height="50" width="50">
 	<img src=".images/icon-slack.svg" alt="Docker logo" height="191" width="191">
