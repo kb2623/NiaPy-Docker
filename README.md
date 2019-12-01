@@ -1,5 +1,7 @@
 # NiaPy docker image
-<p align="center"><img src="https://raw.githubusercontent.com/NiaOrg/NiaPy/master/.github/imgs/NiaPyLogo.png" alt="NiaPy" title="NiaPy"/></p>
+<img src=".images/NiaPyLogo.png" alt="NiaPy logo">
+<img src=".images/plus-sign-in-circle.svg" alt="In combination with">
+<img src=".images/icon-slack.svg" alt="Docker logo">
 
 # Instalation
 Use make file with task in order:
