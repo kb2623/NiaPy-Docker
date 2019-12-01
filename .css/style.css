@@ -1,4 +1,5 @@
 table, tr, td {
+	border-collapse: collapse; border: none;
 	border: none !important;
 	marign: 0 auto !important;
 }
