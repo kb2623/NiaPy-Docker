@@ -1,7 +1,7 @@
 ARG BASE_CONTAINER=pipenv:latest
 FROM $BASE_CONTAINER
 
-MAINTAINER Klemen Berkovic <roxor@gmail.com>
+LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
 LABEL github="https://github.com/NiaOrg"
