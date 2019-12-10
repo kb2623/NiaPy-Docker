@@ -1,4 +1,4 @@
-ARG BASE_CONTAINER=debian:latest
+ARG BASE_CONTAINER=debian:buster
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
