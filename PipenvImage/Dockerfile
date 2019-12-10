@@ -10,9 +10,10 @@ USER root
 WORKDIR /root
 
 # Update the system
-RUN apt update
+RUN apk update
 # Install needed programs
-RUN apt install -y git make vim vifm tmux && apt install -y virtualenv && apt install -y pipenv
+RUN apk add git make vim vifm tmux 
+RUN apk add virtualenv pipenv
 # Add script
 ADD fix-permissions /usr/local/bin/fix-permissions
 RUN chmod a+rx /usr/local/bin/fix-permissions
