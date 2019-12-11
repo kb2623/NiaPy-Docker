@@ -25,4 +25,6 @@ ADD .basic.tmuxtheme /etc/skel
 RUN [ -e /etc/skel/.profile ] && rm /etc/skel/.profile
 ADD .profile /etc/skel
 
-CMD /bin/bash
+ENTRYPOINT /bin/bash
+
+# vim: tabstop=4 noexpandtab shiftwidth=3 softtabstop=3
