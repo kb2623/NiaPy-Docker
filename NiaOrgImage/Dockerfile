@@ -57,4 +57,8 @@ RUN cd NiaPy-examples && make install
 USER $NB_UID
 WORKDIR $NB_HOME/NiaPy-examples
 EXPOSE $NB_PORT
-CMD make lab
+CMD lab
+ENTRYPOINT make
+
+
+# vim: tabstop=4 noexpandtab shiftwidth=3 softtabstop=3
