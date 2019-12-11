@@ -60,5 +60,4 @@ EXPOSE $NB_PORT
 CMD lab
 ENTRYPOINT make
 
-
 # vim: tabstop=4 noexpandtab shiftwidth=3 softtabstop=3
