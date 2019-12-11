@@ -8,6 +8,7 @@ LABEL description="Base image with pipenv and jupyterlab"
 
 USER root
 WORKDIR /root
+ENTRYPOINT /bin/bash
 
 # Update the system
 RUN apk update
@@ -24,7 +25,5 @@ ADD .tmux.conf /etc/skel
 ADD .basic.tmuxtheme /etc/skel
 RUN [ -e /etc/skel/.profile ] && rm /etc/skel/.profile
 ADD .profile /etc/skel
-
-ENTRYPOINT /bin/bash
 
 # vim: tabstop=4 noexpandtab shiftwidth=3 softtabstop=3
