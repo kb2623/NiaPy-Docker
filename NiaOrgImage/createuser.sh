@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 # This script creates a user for runing jupyter lab
 # First script checks if group exists based on GID on GROUP if that is true the the group is deleted

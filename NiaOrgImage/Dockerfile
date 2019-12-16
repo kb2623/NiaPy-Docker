@@ -1,4 +1,4 @@
-FROM 3.7-alpine3.10
+FROM alpine:3.10
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
@@ -14,21 +14,54 @@ ARG NB_PASSWORD="test1234"
 ARG NB_PORT=9999
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
+ARG PYTHON_VERSION=3.7.0
+ARG NO_PROC_MAKE=2
+
 ENV NB_HOME=/home/$NB_USER
 ENV NIA_GIT=https://github.com/kb2623/NiaPy.git
 ENV NIA_EXAMPLES_GIT=https://github.com/kb2623/NiaPy-examples.git
+ENV PYTHON_CONFIG_PREFIX=/usr/local
 
 USER root
 WORKDIR /root
 
+# Install needed programs
+RUN apk add --no-cache git g++ gcc zsh bash make linux-headers build-base \
+ && rm -rf /var/cache/apk/*
+
+# Build and install python
+RUN wget -O python-src.tar.xz https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz \
+ && tar xf python-src.tar.xz \
+ && cd python-src \
+ && ./configure --prefix= $PYTHON_CONFIG_PREFIX --enable-optimizations --enable-shared --without-ensurepip --skip-tests \
+ && make -j $NO_PROC_MAKE \
+ && make -j $NO_PROC_MAKE install \
+ && cd .. \
+ && rm -rf python-src \
+ && rm python-src.tar.xz \
+ && cd /usr/local/bin \
+	&& ln -s idle3 idle \
+	&& ln -s pydoc3 pydoc \
+	&& ln -s python3 python \
+	&& ln -s python3-config python-config
+
+# Install pip
+RUN wget -O get-pip.py https://bootstrap.pypa.io/get-pip.py \
+ && python get-pip.py
+
+# For user skeleton dir
+RUN mkdir -p /etc/skel
+ADD .zshrc /etc/skel
+ADD .profile /etc/skel
+ADD .bashrc /etc/skel
+
 # Create user
-COPY createuser.sh .
+ADD createuser.sh .
 RUN chmod a+rx createuser.sh \
- && echo "auth requisite pam_deny.so" >> /etc/pam.d/su \
  && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
  && chmod g+w /etc/passwd
 
-# Install jupyter lab
+# Install jupyterlab and pipenv
 RUN pip install pipenv jupyterlab
 # Add stings for jupyter
 COPY $NB_KEY.key /etc/jupyter/

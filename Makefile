@@ -51,7 +51,7 @@ clean_net:
 
 ## SSL keys ##########################################################################################
 
-build: ${SSL_KEY}
+build: ${SSL_KEY}_lock.key ${SSL_KEY}.key ${SSL_PEM}.pem
 	-cp ${SSL_KEY}_lock.key NiaOrgImage/${SSL_KEY}_lock.key
 	-cp ${SSL_KEY}.key NiaOrgImage/${SSL_KEY}.key
 	-cp ${SSL_PEM}.pem NiaOrgImage/${SSL_PEM}.pem
