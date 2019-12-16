@@ -30,16 +30,15 @@ RUN apk add --no-cache git g++ gcc zsh bash make linux-headers build-base \
  && rm -rf /var/cache/apk/*
 
 # Build and install python
-RUN wget -O python-src.tar.xz https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz \
- && tar xf python-src.tar.xz \
- && cd python-src \
- && ./configure --prefix= $PYTHON_CONFIG_PREFIX --enable-optimizations --enable-shared --without-ensurepip --skip-tests \
+RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz \
+ && tar xf Python-$PYTHON_VERSION.tar.xz
+RUN cd Python-$PYTHON_VERSION \
+ && ./configure --prefix=$PYTHON_CONFIG_PREFIX --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip \
  && make -j $NO_PROC_MAKE \
- && make -j $NO_PROC_MAKE install \
- && cd .. \
- && rm -rf python-src \
- && rm python-src.tar.xz \
- && cd /usr/local/bin \
+ && make -j $NO_PROC_MAKE install
+RUN rm -rf Python-$PYTHON_VERSION \
+ && rm Python-$PYTHON_VERSION.tar.xz
+RUN cd /usr/local/bin \
 	&& ln -s idle3 idle \
 	&& ln -s pydoc3 pydoc \
 	&& ln -s python3 python \
