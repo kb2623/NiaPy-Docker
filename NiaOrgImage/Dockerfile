@@ -1,12 +1,9 @@
-ARG BASE_CONTAINER=pipenv:latest
-FROM $BASE_CONTAINER
+FROM 3.7-alpine3.10
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
-
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
 LABEL github="https://github.com/NiaOrg"
 LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
-LABEL description="Nature-inspired algorithms are a very popular tool for solving optimization problems. Numerous variants of nature-inspired algorithms have been developed since the beginning of their era. To prove their versatility, those were tested in various domains on various applications, especially when they are hybridized, modified or adapted. However, implementation of nature-inspired algorithms is sometimes a difficult, complex and tedious task. In order to break this wall, NiaPy is intended for simple and quick use, without spending time for implementing algorithms from scratch."
 
 ARG GIT_BRANCH="development"
 ARG NB_USER="jovyan"
@@ -26,33 +23,36 @@ WORKDIR /root
 
 # Create user
 COPY createuser.sh .
-RUN chmod a+rx createuser.sh
-RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
-    ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME && \
-    chmod g+w /etc/passwd && \
-    fix-permissions $NB_HOME
+RUN chmod a+rx createuser.sh \
+ && echo "auth requisite pam_deny.so" >> /etc/pam.d/su \
+ && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
+ && chmod g+w /etc/passwd
 
 # Install jupyter lab
-RUN pip3 install jupyterlab
+RUN pip install pipenv jupyterlab
 # Add stings for jupyter
-COPY jupyter_notebook_config.py /etc/jupyter/
-RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/jupyter/jupyter_notebook_config.py
-RUN printf "c.NotebookApp.keyfile = u'/etc/jupyter/%s.key'\n" $NB_KEY >> /etc/jupyter/jupyter_notebook_config.py
-RUN printf "c.NotebookApp.port = %d\n" $NB_PORT >> /etc/jupyter/jupyter_notebook_config.py
-RUN printf "c.NotebookApp.password = u'%s'\n" $(python3 -c "from notebook.auth import passwd; print(passwd('${NB_PASSWORD}'))") >> /etc/jupyter/jupyter_notebook_config.py
 COPY $NB_KEY.key /etc/jupyter/
 COPY $NB_PEM.pem /etc/jupyter/
-RUN fix-permissions /etc/jupyter/
+COPY jupyter_notebook_config.py /etc/jupyter/
+RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/jupyter/jupyter_notebook_config.py \
+ && printf "c.NotebookApp.keyfile = u'/etc/jupyter/%s.key'\n" $NB_KEY >> /etc/jupyter/jupyter_notebook_config.py \
+ && printf "c.NotebookApp.port = %d\n" $NB_PORT >> /etc/jupyter/jupyter_notebook_config.py \
+ && printf "c.NotebookApp.password = u'%s'\n" $(python3 -c "from notebook.auth import passwd; print(passwd('${NB_PASSWORD}'))") >> /etc/jupyter/jupyter_notebook_config.py
 
 USER $NB_UID
 WORKDIR $NB_HOME
 
 # Get and buld NiaPy
-RUN git clone $NIA_GIT -b $GIT_BRANCH
-RUN cd NiaPy && make build && cd ..
+RUN git clone $NIA_GIT -b $GIT_BRANCH \
+ && cd NiaPy \
+ && make build
+
 # Get and buld NiaPy-examples and run jupyter lab
-RUN git clone $NIA_EXAMPLES_GIT -b $GIT_BRANCH
-RUN cd NiaPy-examples && make install
+RUN git clone $NIA_EXAMPLES_GIT -b $GIT_BRANCH \
+ && cd NiaPy-examples \
+ && make install
+
+## ENTRYPOINT ####################################################
 
 USER $NB_UID
 WORKDIR $NB_HOME/NiaPy-examples
@@ -60,4 +60,4 @@ EXPOSE $NB_PORT
 CMD lab
 ENTRYPOINT make
 
-# vim: tabstop=4 noexpandtab shiftwidth=3 softtabstop=3
+# vim: tabstop=1 expandtab shiftwidth=1 softtabstop=1

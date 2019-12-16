@@ -6,7 +6,6 @@ SSL_PEM:=jupyter_cert
 PIPENV_TAG:=latest
 
 NIAORG_TAG:=latest
-NIAORG_ARG:=BASE_CONTAINER=pipenv:${PIPENV_TAG}
 NIAORG_IP:=164.8.230.37
 NIAORG_SORCE_PORT:=9999
 NIAORG_DESTINATION_PORT:=9999
@@ -21,27 +20,25 @@ NIAORG_NETWORK_GW:=164.8.230.1
 NIAORG_NETWORK_SUBNET:=164.8.230.0/24
 NIAORG_NETWORK_IP:=164.8.230.100
 
+EXEC_USER:=${NIAORG_USER}
+EXEC_SHELL:=/bin/sh
+
+all:
+	-make build
+	-make run
+
+## SSL keys ##########################################################################################
+
 sslkey:
-	openssl genrsa -des3 -out NiaOrgImage/${SSL_KEY}_lock.key 2048
-	openssl rsa -in NiaOrgImage/${SSL_KEY}_lock.key -out NiaOrgImage/${SSL_KEY}.key
-	openssl req -x509 -new -nodes -key NiaOrgImage/${SSL_KEY}.key -sha256 -days 1024 -out NiaOrgImage/${SSL_PEM}.pem
+	openssl genrsa -des3 -out ${SSL_KEY}_lock.key 2048
+	openssl rsa -in ${SSL_KEY}_lock.key -out ${SSL_KEY}.key
+	openssl req -x509 -new -nodes -key ${SSL_KEY}.key -sha256 -days 1024 -out ${SSL_PEM}.pem
 
-sslclean:
-	-rm NiaOrgImage/${SSL_KEY}_lock.key
-	-rm NiaOrgImage/${SSL_KEY}.key
-	-rm NiaOrgImage/${SSL_PEM}.pem
+clean_sslkey:
+	
+## SSL keys ##########################################################################################
 
-buildPipenv: PipenvImage/Dockerfile PipenvImage/fix-permissions PipenvImage/.tmux.conf PipenvImage/.basic.tmuxtheme
-	docker build -t pipenv:${PIPENV_TAG} PipenvImage
-
-buildNiaorg: NiaOrgImage/Dockerfile NiaOrgImage/${SSL_KEY}.key NiaOrgImage/${SSL_PEM}.pem NiaOrgImage/createuser.sh NiaOrgImage/jupyter_notebook_config.py
-	-make buildPipenv 
-	docker build -t niapyorg:${NIAORG_TAG} --build-arg ${NIAORG_ARG} --build-arg NB_PORT=${NIAORG_DESTINATION_PORT} --build-arg NB_KEY=${SSL_KEY} --build-arg NB_PEM=${SSL_PEM} --build-arg NB_PASSWORD=${NIAORG_PASSWORD} --build-arg NB_USER=${NIAORG_USER} --build-arg NB_UID=${NIAORG_UID} --build-arg NB_GROUP=${NIAORG_GROUP} --build-arg NB_GID=${NIAORG_GID} NiaOrgImage
-
-build:
-	-make buildNiaorg
-
-createnet:
+net:
 	docker network create \
 		-d macvlan \
 		--subnet=${NIAORG_NETWORK_SUBNET} \
@@ -49,14 +46,19 @@ createnet:
 		-o parent=${HOST_INTERFACE} \
 		${NIAORG_NETWORK_NAME}
 
-runPipenv:
-	-make buildPipenv
-	docker run -it \
-		--name pipenv-server \
-		pipenv:${PIPENV_TAG} \
-		/bin/bash
+clean_net:
+	docker network rm ${NIAORG_NETWORK_NAME}
 
-runnet:
+## SSL keys ##########################################################################################
+
+build: ${SSL_KEY}
+	-cp ${SSL_KEY}_lock.key NiaOrgImage/${SSL_KEY}_lock.key
+	-cp ${SSL_KEY}.key NiaOrgImage/${SSL_KEY}.key
+	-cp ${SSL_PEM}.pem NiaOrgImage/${SSL_PEM}.pem
+	docker build -t niapyorg:${NIAORG_TAG} --build-arg NB_PORT=${NIAORG_DESTINATION_PORT} --build-arg NB_KEY=${SSL_KEY} --build-arg NB_PEM=${SSL_PEM} --build-arg NB_PASSWORD=${NIAORG_PASSWORD} --build-arg NB_USER=${NIAORG_USER} --build-arg NB_UID=${NIAORG_UID} --build-arg NB_GROUP=${NIAORG_GROUP} --build-arg NB_GID=${NIAORG_GID} NiaOrgImage
+	-rm NiaOrgImage/${SSL_KEY}_lock.key NiaOrgImage/${SSL_KEY}.key NiaOrgImage/${SSL_PEM}.pem
+
+run_net:
 	-make build
 	-make makenet
 	docker run --name=niapyorg-server \
@@ -71,34 +73,20 @@ run:
 		-p ${NIAORG_IP}:${NIAORG_SORCE_PORT}:${NIAORG_DESTINATION_PORT} \
 		-d niapyorg:${NIAORG_TAG}
 
-startPipenv:
-	docker start pipenv-server
-
 start:
 	docker start niapyorg-server
 
-stopPipenv:
-	docker container stop pipenv-server
+exec:
+	docker exec -it -u ${EXEC_USER} niapyorg-server ${EXEC_SHELL}
 
 stop:
 	docker container stop niapyorg-server
-
-removePipenv:
-	-make stopPipenv
-	docker container rm pipenv-server
 
 remove:
 	-make stop
 	docker container rm niapyorg-server
 
-cleanPipenv:
-	-make removePipenv
-	docker image rm pipenv:${PIPENV_TAG}
-
 clean:
+	-make remove
 	docker image rm niapyorg:${NIAORG_TAG}
 
-cleanall: 
-	-make remove
-	-make clean
-	-make cleanPipenv

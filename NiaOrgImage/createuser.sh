@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # This script creates a user for runing jupyter lab
 # First script checks if group exists based on GID on GROUP if that is true the the group is deleted
@@ -14,15 +14,15 @@ aGROUP=$3
 aGID=$4
 aHOME=$5
 
-if id -u "$aUSER" >/dev/null 2>&1; then userdel -r $aUSER; fi
-if id -u "$aUID" >/dev/null 2>&1; then userdel -r $aUID; fi
-if id -g "$aGROUP" >/dev/null 2>&1; then groupdel $aGROUP; fi
-if id -g "$aGID" >/dev/null 2>&1; then groupdel $aGID; fi
-
-groupadd -g $aGID $aGROUP
-useradd -m -u $aUID -g $aGID -s /bin/bash -d $aHOME -k /etc/skel -c 'Jupyter notebook user' $aUSER 
-
-cp -n /etc/skel/.bashrc $aHOME && chown $aUSER:$aGROUP $aHOME/.bashrc
-cp -n /etc/skel/.profile $aHOME && chown $aUSER:$aGROUP $aHOME/.profile
-cp -n /etc/skel/.tmux.conf $aHOME && chown $aUSER:$aGROUP $aHOME/.tmux.conf
-cp -n /etc/skel/.basic.tmuxtheme $aHOME && chown $aUSER:$aGROUP $aHOME/.basic.tmuxtheme
+# Remove user
+if id -u "$aUSER" >/dev/null 2>&1; then deluser --remove-home $aUSER; fi
+if id -u "$aUID" >/dev/null 2>&1; then deluser --remove-home $aUID; fi
+# Remove group
+if id -g "$aGROUP" >/dev/null 2>&1; then delgroup $aGROUP; fi
+if id -g "$aGID" >/dev/null 2>&1; then delgroup $aGID; fi
+# Create group
+addgroup -g $aGID $aGROUP
+# Create user
+adduser -D -u $aUID -G $aGROUP -s /bin/zsh -k /etc/skel -h $aHOME $aUSER 
+# Unlock user
+passwd -u $aUSER
