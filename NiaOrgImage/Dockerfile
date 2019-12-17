@@ -34,7 +34,7 @@ RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSIO
  && tar xf Python-$PYTHON_VERSION.tar.xz
 RUN cd Python-$PYTHON_VERSION \
  && ./configure --prefix=$PYTHON_CONFIG_PREFIX --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip \
- && make -j $NO_PROC_MAKE \
+ && make -j $NO_PROC_MAKE EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
  && make -j $NO_PROC_MAKE install
 RUN rm -rf Python-$PYTHON_VERSION \
  && rm Python-$PYTHON_VERSION.tar.xz
