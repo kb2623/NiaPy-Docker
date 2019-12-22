@@ -1,4 +1,4 @@
-FROM alpine:3.10
+FROM alpine:3.10 AS BASE
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
@@ -15,7 +15,7 @@ ARG NB_PORT=9999
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
 ARG PYTHON_VERSION=3.7.0
-ARG NO_PROC_MAKE=2
+ARG NO_PROC_MAKE=1
 
 ENV NB_HOME=/home/$NB_USER
 ENV NIA_GIT=https://github.com/kb2623/NiaPy.git
@@ -26,14 +26,15 @@ USER root
 WORKDIR /root
 
 # Install needed programs
-RUN apk add --no-cache git g++ gcc zsh bash make linux-headers build-base \
+RUN apk add --no-cache git g++ gcc zsh bash make linux-headers build-base dpkg-dev dpkg ncurses-dev openssl-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev util-linux-dev xz-dev zlib-dev bzip2-dev coreutils \
  && rm -rf /var/cache/apk/*
 
 # Build and install python
 RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tar.xz \
  && tar xf Python-$PYTHON_VERSION.tar.xz
 RUN cd Python-$PYTHON_VERSION \
- && ./configure --prefix=$PYTHON_CONFIG_PREFIX --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip \
+ && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+ && ./configure --prefix=$PYTHON_CONFIG_PREFIX --build="${gnuArch}" --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip \
  && make -j $NO_PROC_MAKE EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
  && make -j $NO_PROC_MAKE install
 RUN rm -rf Python-$PYTHON_VERSION \
