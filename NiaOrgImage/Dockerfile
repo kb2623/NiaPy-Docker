@@ -1,19 +1,11 @@
-FROM alpine:3.10 AS BASE
+ARG GIT_BRANCH="development"
+FROM alpine:3.10 AS NiaPyOrg_base:$GIT_BRANCH
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
 LABEL github="https://github.com/NiaOrg"
 LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
 
-ARG GIT_BRANCH="development"
-ARG NB_USER="jovyan"
-ARG NB_UID=1001
-ARG NB_GROUP="jovyan"
-ARG NB_GID=1001
-ARG NB_PASSWORD="test1234"
-ARG NB_PORT=9999
-ARG NB_KEY=jupyter_server
-ARG NB_PEM=jupyter_cert
 ARG PYTHON_VERSION=3.7.0
 ARG NO_PROC_MAKE=1
 
@@ -61,6 +53,25 @@ RUN chmod a+rx createuser.sh \
  && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
  && chmod g+w /etc/passwd
 
+FROM NiaPyOrg_base:$GIT_BRANCH
+
+LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
+LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
+LABEL github="https://github.com/NiaOrg"
+LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
+
+ARG NB_USER="jovyan"
+ARG NB_UID=1001
+ARG NB_GROUP="jovyan"
+ARG NB_GID=1001
+ARG NB_PASSWORD="test1234"
+ARG NB_PORT=9999
+ARG NB_KEY=jupyter_server
+ARG NB_PEM=jupyter_cert
+
+USER root
+WORKDIR /root
+
 # Install jupyterlab and pipenv
 RUN pip install pipenv jupyterlab
 # Add stings for jupyter
@@ -89,7 +100,9 @@ RUN git clone $NIA_EXAMPLES_GIT -b $GIT_BRANCH \
 
 USER $NB_UID
 WORKDIR $NB_HOME/NiaPy-examples
+
 EXPOSE $NB_PORT
+
 CMD lab
 ENTRYPOINT make
 
