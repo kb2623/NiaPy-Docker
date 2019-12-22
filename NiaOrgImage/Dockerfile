@@ -1,5 +1,4 @@
-ARG GIT_BRANCH="development"
-FROM alpine:3.10 AS NiaPyOrg_base:$GIT_BRANCH
+FROM alpine:3.10 AS NiaPyOrg_base
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
@@ -53,7 +52,8 @@ RUN chmod a+rx createuser.sh \
  && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
  && chmod g+w /etc/passwd
 
-FROM NiaPyOrg_base:$GIT_BRANCH
+ARG GIT_BRANCH="development"
+FROM NiaPyOrg_base
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
