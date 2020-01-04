@@ -59,7 +59,6 @@ ARG NB_UID=1001
 ARG NB_GROUP="jovyan"
 ARG NB_GID=1001
 ARG NB_PASSWORD="test1234"
-ARG NB_PORT=9999
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
 ARG NIA_GIT="https://github.com/kb2623/NiaPy.git"
@@ -81,9 +80,10 @@ RUN pip install pipenv jupyterlab
 COPY $NB_KEY.key /etc/jupyter/
 COPY $NB_PEM.pem /etc/jupyter/
 COPY jupyter_notebook_config.py /etc/jupyter/
+RUN 
 RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/jupyter/jupyter_notebook_config.py \
  && printf "c.NotebookApp.keyfile = u'/etc/jupyter/%s.key'\n" $NB_KEY >> /etc/jupyter/jupyter_notebook_config.py \
- && printf "c.NotebookApp.port = %d\n" $NB_PORT >> /etc/jupyter/jupyter_notebook_config.py \
+ && printf "c.NotebookApp.port = 9999\n" >> /etc/jupyter/jupyter_notebook_config.py \
  && printf "c.NotebookApp.password = u'%s'\n" $(python3 -c "from notebook.auth import passwd; print(passwd('${NB_PASSWORD}'))") >> /etc/jupyter/jupyter_notebook_config.py
 
 USER $NB_UID
@@ -104,7 +104,7 @@ RUN git clone $NIA_EXAMPLES_GIT -b $GIT_BRANCH \
 USER $NB_UID
 WORKDIR $NB_HOME/NiaPy-examples
 
-EXPOSE $NB_PORT
+EXPOSE 9999
 
 CMD lab
 ENTRYPOINT make
