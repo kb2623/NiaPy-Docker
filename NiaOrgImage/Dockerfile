@@ -5,7 +5,7 @@ LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligen
 LABEL github="https://github.com/NiaOrg"
 LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
 
-ARG PYTHON_VERSION=3.7.0
+ARG PYTHON_VERSION=3.8.0
 ARG NO_PROC_MAKE=1
 
 ENV NB_HOME=/home/$NB_USER
@@ -46,12 +46,6 @@ ADD .zshrc /etc/skel
 ADD .profile /etc/skel
 ADD .bashrc /etc/skel
 
-# Create user
-ADD createuser.sh .
-RUN chmod a+rx createuser.sh \
- && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
- && chmod g+w /etc/passwd
-
 ARG GIT_BRANCH="development"
 FROM NiaPyOrg_base
 
@@ -68,9 +62,18 @@ ARG NB_PASSWORD="test1234"
 ARG NB_PORT=9999
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
+ARG NIA_GIT="https://github.com/kb2623/NiaPy.git"
+ARG NIA_EXAMPLES_GIT="https://github.com/kb2623/NiaPy-examples.git"
+ARG GIT_BRANCH="development"
 
 USER root
 WORKDIR /root
+
+# Create user
+ADD createuser.sh .
+RUN chmod a+rx createuser.sh \
+ && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
+ && chmod g+w /etc/passwd
 
 # Install jupyterlab and pipenv
 RUN pip install pipenv jupyterlab
