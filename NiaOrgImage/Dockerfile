@@ -17,7 +17,7 @@ USER root
 WORKDIR /root
 
 # Install needed programs
-RUN apk add --no-cache git g++ gcc zsh bash make linux-headers build-base dpkg-dev dpkg ncurses-dev openssl-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev util-linux-dev xz-dev zlib-dev bzip2-dev coreutils \
+RUN apk add --no-cache git g++ gcc zsh bash make linux-headers build-base dpkg-dev dpkg ncurses-dev openssl-dev pax-utils sqlite-dev tcl-dev tk tk-dev util-linux-dev util-linux-dev xz-dev zlib-dev bzip2-dev coreutils expat-dev gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev readline-dev \
  && rm -rf /var/cache/apk/*
 
 # Build and install python
@@ -25,7 +25,7 @@ RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSIO
  && tar xf Python-$PYTHON_VERSION.tar.xz
 RUN cd Python-$PYTHON_VERSION \
  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
- && ./configure --prefix=$PYTHON_CONFIG_PREFIX --build="${gnuArch}" --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip \
+ && ./configure --prefix=$PYTHON_CONFIG_PREFIX --build="${gnuArch}" --enable-optimizations --enable-shared --enable-loadable-sqlite-extensions --with-system-expat --with-system-ffi --without-ensurepip \
  && make -j $NO_PROC_MAKE EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
  && make -j $NO_PROC_MAKE install
 RUN rm -rf Python-$PYTHON_VERSION \
