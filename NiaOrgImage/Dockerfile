@@ -80,7 +80,6 @@ RUN pip install pipenv jupyterlab
 COPY $NB_KEY.key /etc/jupyter/
 COPY $NB_PEM.pem /etc/jupyter/
 COPY jupyter_notebook_config.py /etc/jupyter/
-RUN 
 RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/jupyter/jupyter_notebook_config.py \
  && printf "c.NotebookApp.keyfile = u'/etc/jupyter/%s.key'\n" $NB_KEY >> /etc/jupyter/jupyter_notebook_config.py \
  && printf "c.NotebookApp.port = 9999\n" >> /etc/jupyter/jupyter_notebook_config.py \
