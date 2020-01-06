@@ -25,6 +25,7 @@ RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSIO
  && tar xf Python-$PYTHON_VERSION.tar.xz
 RUN cd Python-$PYTHON_VERSION \
  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+ && CXX=g++ \
  && ./configure --prefix=$PYTHON_CONFIG_PREFIX --build="${gnuArch}" --enable-optimizations --enable-shared --enable-loadable-sqlite-extensions --with-system-expat --with-system-ffi --without-ensurepip \
  && make -j $NO_PROC_MAKE EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
  && make -j $NO_PROC_MAKE install
@@ -102,9 +103,7 @@ RUN git clone $NIA_EXAMPLES_GIT -b $GIT_BRANCH \
 
 USER $NB_UID
 WORKDIR $NB_HOME/NiaPy-examples
-
 EXPOSE 9999
-
 CMD lab
 ENTRYPOINT make
 
