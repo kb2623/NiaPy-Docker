@@ -17,13 +17,7 @@ USER root
 WORKDIR /root
 
 RUN apk add --no-cache --virtual .fetch-deps gnupg tar xz \
- && wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
- && wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
- && export GNUPGHOME="$(mktemp -d)" \
- && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY" \
- && gpg --batch --verify python.tar.xz.asc python.tar.xz \
- && { command -v gpgconf > /dev/null && gpgconf --kill all || :; } \
- && rm -rf "$GNUPGHOME" python.tar.xz.asc \
+ && wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tar.xz" \
  && mkdir -p /usr/src/python \
  && tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
  && rm python.tar.xz
@@ -32,7 +26,7 @@ RUN apk add --no-cache --virtual .build-deps bzip2-dev coreutils dpkg-dev dpkg e
  && apk del .fetch-deps
 RUN cd /usr/src/python \
  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
- && ./configure --build="$gnuArch" --enable-loadable-sqlite-extensions --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip --prefix=$PYTHON_CONFIG_PREFIX \
+ && ./configure --build="${gnuArch}" --enable-loadable-sqlite-extensions --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip --prefix=$PYTHON_CONFIG_PREFIX \
  && make -j "$(nproc)" EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
  && make install \
  && apk del .build-deps
