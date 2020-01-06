@@ -21,7 +21,7 @@ RUN apk add --no-cache --virtual .fetch-deps gnupg tar xz \
  && mkdir -p /usr/src/python \
  && tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
  && rm python.tar.xz
-RUN apk add --no-cache bzip2-dev coreutils dpkg-dev dpkg expat-dev findutils gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev linux-headers make ncurses-dev openssl-dev pax-utils readline-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev xz-dev zlib-dev gcc g++ tmux \
+RUN apk add --no-cache bzip2-dev coreutils dpkg-dev dpkg expat-dev findutils gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev linux-headers make ncurses-dev openssl-dev pax-utils readline-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev xz-dev zlib-dev gcc g++ \
  && apk del .fetch-deps
 RUN cd /usr/src/python \
  && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
@@ -72,8 +72,9 @@ RUN chmod a+rx createuser.sh \
  && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
  && chmod g+w /etc/passwd
 
-# Install jupyterlab and pipenv
-RUN pip install pipenv jupyterlab
+# Install programs
+RUN apk add tmux git gdb \
+ && pip install pipenv jupyterlab
 # Add stings for jupyter
 COPY $NB_KEY.key /etc/jupyter/
 COPY $NB_PEM.pem /etc/jupyter/
