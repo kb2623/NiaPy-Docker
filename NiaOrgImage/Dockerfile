@@ -62,16 +62,17 @@ RUN git clone $NIA_GIT -b $NIA_GIT_BRANCH \
  && make build
 
 # Get and buld NiaPy-examples and run jupyter lab
-RUN git clone $NIA_GIT_EXAMPLES -b $NIA_GIT_BRANCH_EXAMPLES \
- && cd NiaPy-examples \
- && make install
+RUN git clone $NIA_GIT_EXAMPLES -b $NIA_GIT_BRANCH_EXAMPLES
+#&& cd NiaPy-examples \
+#&& make install
 
 ## ENTRYPOINT ####################################################
 
 USER $NB_UID
-WORKDIR $NB_HOME/NiaPy-examples
-EXPOSE 9999
+#WORKDIR $NB_HOME/NiaPy-examples
+WORKDIR $NB_HOME
+#EXPOSE 9999
 CMD lab
-ENTRYPOINT make
+ENTRYPOINT bash
 
 # vim: tabstop=1 expandtab shiftwidth=1 softtabstop=1

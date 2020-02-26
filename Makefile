@@ -69,8 +69,17 @@ run_net:
 run:
 	-make build
 	docker run --name niapyorg-server \
+		--hostname niapy.org \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-d niapyorg:${NIAORG_TAG}
+
+run_bash:
+	-make build
+	docker run --rm -it \
+		--hostname niapy.org \
+		-p ${NIAORG_SORCE_PORT}:9999 \
+		niapyorg:${NIAORG_TAG} \
+		/bin/bash
 
 start:
 	docker start niapyorg-server
