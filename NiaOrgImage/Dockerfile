@@ -1,12 +1,22 @@
-FROM alpine:3.10 AS NiaPyOrg_base
+ARG PYTHON_VERSION=3.8.0
+FROM python:$PYTHON_VERSION-alpine
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
 LABEL github="https://github.com/NiaOrg"
 LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
 
-ARG PYTHON_VERSION=3.8.0
 ARG NO_PROC_MAKE=1
+ARG GIT_BRANCH="development"
+ARG NB_USER="jovyan"
+ARG NB_UID=1001
+ARG NB_GROUP="jovyan"
+ARG NB_GID=1001
+ARG NB_PASSWORD="test1234"
+ARG NB_KEY=jupyter_server
+ARG NB_PEM=jupyter_cert
+ARG NIA_GIT="https://github.com/NiaPy/NiaPy.git"
+ARG NIA_EXAMPLES_GIT="https://github.com/NiaPy/NiaPy-examples.git"
 
 ENV NB_HOME=/home/$NB_USER
 ENV NIA_GIT=https://github.com/kb2623/NiaPy.git
@@ -16,52 +26,11 @@ ENV PYTHON_CONFIG_PREFIX=/usr/local
 USER root
 WORKDIR /root
 
-RUN apk add --no-cache --virtual .fetch-deps gnupg tar xz \
- && wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tar.xz" \
- && mkdir -p /usr/src/python \
- && tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
- && rm python.tar.xz
-RUN apk add --no-cache bzip2-dev coreutils dpkg-dev dpkg expat-dev findutils gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev linux-headers make ncurses-dev openssl-dev pax-utils readline-dev sqlite-dev tcl-dev tk tk-dev util-linux-dev xz-dev zlib-dev gcc g++ \
- && apk del .fetch-deps
-RUN cd /usr/src/python \
- && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
- && ./configure --build="${gnuArch}" --enable-loadable-sqlite-extensions --enable-optimizations --enable-shared --with-system-expat --with-system-ffi --without-ensurepip --prefix=$PYTHON_CONFIG_PREFIX \
- && make -j "$(nproc)" EXTRA_CFLAGS="-DTHREAD_STACK_SIZE=0x100000" \
- && make install
-RUN cd /usr/local/bin \
-	&& ln -s idle3 idle \
-	&& ln -s pydoc3 pydoc \
-	&& ln -s python3 python \
-	&& ln -s python3-config python-config
-
-# Install pip
-RUN wget -O get-pip.py https://bootstrap.pypa.io/get-pip.py \
- && python get-pip.py
-
 # For user skeleton dir
 RUN mkdir -p /etc/skel
 ADD .zshrc /etc/skel
 ADD .profile /etc/skel
 ADD .bashrc /etc/skel
-
-ARG GIT_BRANCH="development"
-FROM NiaPyOrg_base
-
-LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
-LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
-LABEL github="https://github.com/NiaOrg"
-LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
-
-ARG NB_USER="jovyan"
-ARG NB_UID=1001
-ARG NB_GROUP="jovyan"
-ARG NB_GID=1001
-ARG NB_PASSWORD="test1234"
-ARG NB_KEY=jupyter_server
-ARG NB_PEM=jupyter_cert
-ARG NIA_GIT="https://github.com/kb2623/NiaPy.git"
-ARG NIA_EXAMPLES_GIT="https://github.com/kb2623/NiaPy-examples.git"
-ARG GIT_BRANCH="development"
 
 USER root
 WORKDIR /root
@@ -73,7 +42,8 @@ RUN chmod a+rx createuser.sh \
  && chmod g+w /etc/passwd
 
 # Install programs
-RUN apk add tmux git gdb \
+RUN apk add tmux git gcc g++ gdb bash make zeromq-dev \
+ && pip install --upgrade pip \ 
  && pip install pipenv jupyterlab
 # Add stings for jupyter
 COPY $NB_KEY.key /etc/jupyter/
