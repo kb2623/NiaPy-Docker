@@ -1,5 +1,5 @@
-ARG PYTHON_VERSION=3.8.0
-FROM python:$PYTHON_VERSION-alpine
+ARG PYTHON_VERSION=3.6
+FROM python:$PYTHON_VERSION-slim
 
 LABEL maintainer="Klemen Berkovic <roxor@gmail.com>"
 LABEL tags="python, microframework, nature-inspired-algorithms, swarm-intelligence, optimization-algorithms"
@@ -7,7 +7,6 @@ LABEL github="https://github.com/NiaOrg"
 LABEL github-docker="https://github.com/NiaOrg/NiaPy-Docker"
 
 ARG NO_PROC_MAKE=1
-ARG GIT_BRANCH="development"
 ARG NB_USER="jovyan"
 ARG NB_UID=1001
 ARG NB_GROUP="jovyan"
@@ -16,7 +15,9 @@ ARG NB_PASSWORD="test1234"
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
 ARG NIA_GIT="https://github.com/NiaOrg/NiaPy.git"
-ARG NIA_EXAMPLES_GIT="https://github.com/NiaOrg/NiaPy-examples.git"
+ARG NIA_GIT_BRANCH="development"
+ARG NIA_GIT_EXAMPLES="https://github.com/NiaOrg/NiaPy-examples.git"
+ARG NIA_GIT_BRANCH_EXAMPLES="development"
 
 ENV NB_HOME=/home/$NB_USER
 
@@ -35,11 +36,12 @@ WORKDIR /root
 # Create user
 ADD createuser.sh .
 RUN chmod a+rx createuser.sh \
- && ./createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
+ && bash createuser.sh $NB_USER $NB_UID $NB_GROUP $NB_GID $NB_HOME \
  && chmod g+w /etc/passwd
 
 # Install programs
-RUN apk add tmux git gcc g++ gdb bash make zeromq-dev \
+RUN apt update \
+ && apt install -y tmux git gcc g++ gdb make bash zsh \
  && pip install --upgrade pip \ 
  && pip install pipenv jupyterlab
 # Add stings for jupyter
@@ -55,12 +57,12 @@ USER $NB_UID
 WORKDIR $NB_HOME
 
 # Get and buld NiaPy
-RUN git clone $NIA_GIT -b $GIT_BRANCH \
+RUN git clone $NIA_GIT -b $NIA_GIT_BRANCH \
  && cd NiaPy \
  && make build
 
 # Get and buld NiaPy-examples and run jupyter lab
-RUN git clone $NIA_EXAMPLES_GIT -b $GIT_BRANCH \
+RUN git clone $NIA_GIT_EXAMPLES -b $NIA_GIT_BRANCH_EXAMPLES \
  && cd NiaPy-examples \
  && make install
 

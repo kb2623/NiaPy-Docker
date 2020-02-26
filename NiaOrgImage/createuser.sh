@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script creates a user for runing jupyter lab
 # First script checks if group exists based on GID on GROUP if that is true the the group is deleted
@@ -21,8 +21,8 @@ if id -u "$aUID" >/dev/null 2>&1; then deluser --remove-home $aUID; fi
 if id -g "$aGROUP" >/dev/null 2>&1; then delgroup $aGROUP; fi
 if id -g "$aGID" >/dev/null 2>&1; then delgroup $aGID; fi
 # Create group
-addgroup -g $aGID $aGROUP
+addgroup --gid $aGID $aGROUP
 # Create user
-adduser -D -u $aUID -G $aGROUP -s /bin/zsh -k /etc/skel -h $aHOME $aUSER 
+adduser --home $aHOME --shell /bin/bash --uid $aUID --gid $aGID $aUSER 
 # Unlock user
-passwd -u $aUSER
+usermod -p '987654321test123456789' $aUSER
