@@ -17,7 +17,7 @@ ARG NB_PEM=jupyter_cert
 ARG NIA_GIT="https://github.com/NiaOrg/NiaPy.git"
 ARG NIA_GIT_BRANCH="development"
 ARG NIA_GIT_EXAMPLES="https://github.com/NiaOrg/NiaPy-examples.git"
-ARG NIA_GIT_BRANCH_EXAMPLES="development"
+ARG NIA_GIT_BRANCH_EXAMPLES="master"
 
 ENV NB_HOME=/home/$NB_USER
 
