@@ -15,13 +15,10 @@ ARG NB_GID=1001
 ARG NB_PASSWORD="test1234"
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
-ARG NIA_GIT="https://github.com/NiaPy/NiaPy.git"
-ARG NIA_EXAMPLES_GIT="https://github.com/NiaPy/NiaPy-examples.git"
+ARG NIA_GIT="https://github.com/NiaOrg/NiaPy.git"
+ARG NIA_EXAMPLES_GIT="https://github.com/NiaOrg/NiaPy-examples.git"
 
 ENV NB_HOME=/home/$NB_USER
-ENV NIA_GIT=https://github.com/kb2623/NiaPy.git
-ENV NIA_EXAMPLES_GIT=https://github.com/kb2623/NiaPy-examples.git
-ENV PYTHON_CONFIG_PREFIX=/usr/local
 
 USER root
 WORKDIR /root
