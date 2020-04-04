@@ -15,7 +15,7 @@ NIAORG_PASSWORD:=test1234
 NIAORG_USER:=$(shell id -un ${USER})
 NIAORG_UID:=$(shell id -u ${USER})
 NIAORG_GROUP:=$(shell id -gn ${USER})
-NIAORG_GID:=$(shell id -gn ${USER})
+NIAORG_GID:=$(shell id -g ${USER})
 NIAORG_VOLUME_SRC:=/tmp/NiaPy-Docker
 
 NIAORG_NETWORK_NAME:=mynet123
@@ -99,7 +99,7 @@ run_net: volume
 run: volume
 	-make build
 	docker run --name niaorg-server \
-		--hostname niapy.org \
+		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
 		-d niaorg:${NIAORG_TAG}
