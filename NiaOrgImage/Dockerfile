@@ -43,7 +43,7 @@ RUN chmod a+rx createuser.sh \
 RUN apt update \
  && apt install -y tmux git gcc g++ gdb make bash zsh \
  && pip install --upgrade pip \ 
- && pip install pipenv jupyterlab
+ && pip install pipenv jupyterlab ipython
 # Add stings for jupyter
 COPY $NB_KEY.key /etc/jupyter/
 COPY $NB_PEM.pem /etc/jupyter/
