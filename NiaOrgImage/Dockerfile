@@ -56,22 +56,25 @@ RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/j
 USER $NB_UID
 WORKDIR $NB_HOME
 
+RUN mkdir NiaOrg \
+ && ln -s /mnt/NiaOrg NiaOrg
+
 # Get and buld NiaPy
-RUN git clone $NIA_GIT -b $NIA_GIT_BRANCH \
- && cd NiaPy \
+RUN git clone $NIA_GIT -b $NIA_GIT_BRANCH NiaOrg/NiaPy \
+ && cd NiaOrg/NiaPy \
  && make build
 
 # Get and buld NiaPy-examples and run jupyter lab
-RUN git clone $NIA_GIT_EXAMPLES -b $NIA_GIT_BRANCH_EXAMPLES
+RUN git clone $NIA_GIT_EXAMPLES -b $NIA_GIT_BRANCH_EXAMPLES NiaOrg/NiaPy-examples
 #&& cd NiaPy-examples \
 #&& make install
 
 ## ENTRYPOINT ####################################################
 
 USER $NB_UID
-#WORKDIR $NB_HOME/NiaPy-examples
 WORKDIR $NB_HOME
-#EXPOSE 9999
+VOLUME /mnt/NiaOrg
+EXPOSE 9999
 CMD lab
 ENTRYPOINT bash
 
