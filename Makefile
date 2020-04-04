@@ -39,7 +39,7 @@ all:
 ## Volume ############################################################################################
 
 volume:
-	mkdir -p ${DOCKER_VOLUME_SRC}
+	mkdir -p ${NIAORG_VOLUME_SRC}
 	chown -R ${NIAORG_UID}:${NIAORG_GID} ${NIAORG_VOLUME_SRC}
 
 clean_volume: ${DOCKER_VOLUME_SRC}
@@ -93,10 +93,8 @@ build: ${SSL_KEY}_lock.key ${SSL_KEY}.key ${SSL_PEM}.pem
 build_clean:
 	docker image rm niaorg:${NIAORG_TAG}
 
-run_net: volume
-	-make build
-	-make makenet
-	docker run --name=niaorg-server \
+create_net: volume
+	docker create --name=niaorg-server \
 		--network=${NIAORG_NETWORK_NAME} \
 		--ip=${NIAORG_NETWORK_IP} \
 		--hostname niaorg \
@@ -104,31 +102,39 @@ run_net: volume
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
 		-d niaorg:${NIAORG_TAG}
 
-run: volume
-	-make build
-	docker run --name niaorg-server \
+create: volume
+	docker create --name niaorg-server \
 		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
 		-d niaorg:${NIAORG_TAG}
 
-run_bash: volume
-	-make build
+run: volume
 	docker run --rm -it \
 		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
 		niaorg:${NIAORG_TAG} \
-		/bin/bash
+		${EXEC_SHELL}
+
+run_net: volume
+	docker run --rn -it \
+		--network=${NIAORG_NETWORK_NAME} \
+		--ip=${NIAORG_NETWORK_IP} \
+		--hostname niaorg \
+		-p ${NIAORG_SORCE_PORT}:9999 \
+		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
+		niaorg:${NIAORG_TAG} \
+		${EXEC_SHELL}
 
 start:
 	docker start niaorg-server
 
+stop:
+	docker stop niaorg-server
+
 exec:
 	docker exec -it -u ${EXEC_USER} niaorg-server ${EXEC_SHELL}
-
-stop:
-	docker container stop niaorg-server
 
 remove:
 	-make stop
