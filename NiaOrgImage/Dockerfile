@@ -15,7 +15,7 @@ ARG NB_PASSWORD="test1234"
 ARG NB_KEY=jupyter_server
 ARG NB_PEM=jupyter_cert
 ARG NIA_GIT="https://github.com/NiaOrg/NiaPy.git"
-ARG NIA_GIT_BRANCH="development"
+ARG NIA_GIT_BRANCH="master"
 ARG NIA_GIT_EXAMPLES="https://github.com/NiaOrg/NiaPy-examples.git"
 ARG NIA_GIT_BRANCH_EXAMPLES="master"
 
@@ -51,7 +51,9 @@ COPY jupyter_notebook_config.py /etc/jupyter/
 RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/jupyter/jupyter_notebook_config.py \
  && printf "c.NotebookApp.keyfile = u'/etc/jupyter/%s.key'\n" $NB_KEY >> /etc/jupyter/jupyter_notebook_config.py \
  && printf "c.NotebookApp.port = 9999\n" >> /etc/jupyter/jupyter_notebook_config.py \
- && printf "c.NotebookApp.password = u'%s'\n" $(python3 -c "from notebook.auth import passwd; print(passwd('${NB_PASSWORD}'))") >> /etc/jupyter/jupyter_notebook_config.py
+ && printf "c.NotebookApp.password = u'%s'\n" $(python3 -c "from notebook.auth import passwd; print(passwd('${NB_PASSWORD}'))") >> /etc/jupyter/jupyter_notebook_config.py \
+ && mkdir -p /mnt/NiaOrg \
+ && chown -R ${NB_UID}:${NB_GID} /mnt/NiaOrg
 
 USER $NB_UID
 WORKDIR $NB_HOME

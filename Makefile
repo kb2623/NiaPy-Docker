@@ -1,5 +1,6 @@
 SHELL:=/bin/bash
 USER:=$(shell id -un)
+PYTHON_VERSION=3.6
 
 HOST_INTERFACE=enp96s0f0
 
@@ -16,7 +17,7 @@ NIAORG_USER:=$(shell id -un ${USER})
 NIAORG_UID:=$(shell id -u ${USER})
 NIAORG_GROUP:=$(shell id -gn ${USER})
 NIAORG_GID:=$(shell id -g ${USER})
-NIAORG_VOLUME_SRC:=/tmp/NiaPy-Docker
+NIAORG_VOLUME_SRC:=/tmp/NiaOrg-${NIAORG_TAG}-python-${PYTHON_VERSION}
 
 NIAORG_NETWORK_NAME:=mynet123
 NIAORG_NETWORK_GW:=93.103.177.1
@@ -24,9 +25,9 @@ NIAORG_NETWORK_SUBNET:=93.103.177.0/16
 NIAORG_NETWORK_IP:=93.103.177.239
 
 NIAORG_NIAPY_GIT:="https://github.com/NiaOrg/NiaPy.git"
-NIAORG_NIAPY_GIT_BRANCH:="development"
+NIAORG_NIAPY_GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 NIAORG_NIAPY_EXAMPLES_GIT:="https://github.com/NiaOrg/NiaPy-examples.git"
-NIAORG_NIAPY_EXAMPLES_GIT_BRANCH:="development"
+NIAORG_NIAPY_EXAMPLES_GIT_BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 
 EXEC_USER:=${NIAORG_USER}
 EXEC_SHELL:=/bin/sh
@@ -36,6 +37,7 @@ all:
 	-make run
 
 ## Volume ############################################################################################
+
 volume:
 	mkdir -p ${DOCKER_VOLUME_SRC}
 	chown -R ${NIAORG_UID}:${NIAORG_GID} ${NIAORG_VOLUME_SRC}
@@ -51,6 +53,7 @@ sslkey:
 	openssl req -x509 -new -nodes -key ${SSL_KEY}.key -sha256 -days 1024 -out ${SSL_PEM}.pem
 
 clean_sslkey:
+	rm -f ${SSL_KEY}.key ${SSL_PEM}.pem
 	
 ## SSL keys ##########################################################################################
 
@@ -72,6 +75,7 @@ build: ${SSL_KEY}_lock.key ${SSL_KEY}.key ${SSL_PEM}.pem
 	-cp ${SSL_KEY}.key NiaOrgImage/${SSL_KEY}.key
 	-cp ${SSL_PEM}.pem NiaOrgImage/${SSL_PEM}.pem
 	docker build -t niaorg:${NIAORG_TAG} NiaOrgImage \
+		--build-arg PYTHON_VERSION=${PYTHON_VERSION} \
 		--build-arg NB_PORT=${NIAORG_DESTINATION_PORT} \
 		--build-arg NB_KEY=${SSL_KEY} \
 		--build-arg NB_PEM=${SSL_PEM} \
@@ -86,12 +90,16 @@ build: ${SSL_KEY}_lock.key ${SSL_KEY}.key ${SSL_PEM}.pem
 		--build-arg NIA_GIT_BRANCH_EXAMPLES=${NIAORG_NIAPY_EXAMPLES_GIT_BRANCH}
 	-rm NiaOrgImage/${SSL_KEY}_lock.key NiaOrgImage/${SSL_KEY}.key NiaOrgImage/${SSL_PEM}.pem
 
+build_clean:
+	docker image rm niaorg:${NIAORG_TAG}
+
 run_net: volume
 	-make build
 	-make makenet
 	docker run --name=niaorg-server \
 		--network=${NIAORG_NETWORK_NAME} \
 		--ip=${NIAORG_NETWORK_IP} \
+		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
 		-d niaorg:${NIAORG_TAG}
@@ -107,7 +115,7 @@ run: volume
 run_bash: volume
 	-make build
 	docker run --rm -it \
-		--hostname niapy.org \
+		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
 		niaorg:${NIAORG_TAG} \
@@ -125,6 +133,7 @@ stop:
 remove:
 	-make stop
 	docker container rm niaorg-server
+	-make build_clean
 
 clean:
 	-make remove
