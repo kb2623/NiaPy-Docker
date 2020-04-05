@@ -114,8 +114,7 @@ run: volume
 		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
-		niaorg:${NIAORG_TAG}
-		#${EXEC_SHELL}
+		niaorg:${NIAORG_TAG}-python-${PYTHON_VERSION}
 
 run_net: volume
 	docker run --rn -it \
