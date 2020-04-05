@@ -41,7 +41,7 @@ RUN chmod a+rx createuser.sh \
 
 # Install programs
 RUN apt update \
- && apt install -y tmux git gcc g++ gdb make bash zsh \
+ && apt install -y tmux git gcc g++ gdb make bash zsh vim \
  && pip install --upgrade pip \ 
  && pip install pipenv jupyterlab ipython
 # Add stings for jupyter
@@ -58,17 +58,21 @@ RUN printf "c.NotebookApp.certfile = u'/etc/jupyter/%s.pem'\n" $NB_PEM >> /etc/j
 USER $NB_UID
 WORKDIR $NB_HOME
 
-ADD startup.sh .
-RUN mkdir NiaOrg \
+ADD git_init.sh .
+
+RUN sed -i "3iNIA_GIT=$NIA_GIT" git_init.sh \
+ && sed -i "3iNIA_GIT_BRANCH=$NIA_GIT_BRANCH" git_init.sh \
+ && sed -i "3iNIA_GIT_EXAMPLES=$NIA_GIT_EXAMPLES" git_init.sh \
+ && sed -i "3iNIA_GIT_BRANCH_EXAMPLES=$NIA_GIT_BRANCH_EXAMPLES" git_init.sh \
  && ln -s /mnt/NiaOrg NiaOrg
 
 ## ENTRYPOINT ####################################################
 
 USER $NB_UID
-WORKDIR $NB_HOME/NiaOrg
+WORKDIR $NB_HOME
 VOLUME /mnt/NiaOrg
 EXPOSE 9999
-CMD startup.sh $NIA_GIT $NIA_GIT_BRANCH $NIA_GIT_EXAMPLES $NIA_GIT_BRANCH_EXAMPLES
+CMD git_init.sh
 ENTRYPOINT bash
 
 # vim: tabstop=1 expandtab shiftwidth=1 softtabstop=1
