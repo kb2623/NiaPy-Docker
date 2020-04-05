@@ -72,7 +72,7 @@ USER $NB_UID
 WORKDIR $NB_HOME
 VOLUME /mnt/NiaOrg
 EXPOSE 9999
-CMD git_init.sh
 ENTRYPOINT bash
+CMD git_init.sh
 
 # vim: tabstop=1 expandtab shiftwidth=1 softtabstop=1

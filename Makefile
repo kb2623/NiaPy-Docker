@@ -1,6 +1,6 @@
 SHELL:=/bin/bash
 USER:=$(shell id -un)
-PYTHON_VERSION=3.6
+PYTHON_VERSION=3.7
 
 HOST_INTERFACE=enp96s0f0
 
@@ -74,7 +74,7 @@ build: ${SSL_KEY}_lock.key ${SSL_KEY}.key ${SSL_PEM}.pem
 	-cp ${SSL_KEY}_lock.key NiaOrgImage/${SSL_KEY}_lock.key
 	-cp ${SSL_KEY}.key NiaOrgImage/${SSL_KEY}.key
 	-cp ${SSL_PEM}.pem NiaOrgImage/${SSL_PEM}.pem
-	docker build -t niaorg:${NIAORG_TAG} NiaOrgImage \
+	docker build -t niaorg:${NIAORG_TAG}-python-${PYTHON_VERSION} NiaOrgImage \
 		--build-arg PYTHON_VERSION=${PYTHON_VERSION} \
 		--build-arg NB_PORT=${NIAORG_DESTINATION_PORT} \
 		--build-arg NB_KEY=${SSL_KEY} \
@@ -91,7 +91,7 @@ build: ${SSL_KEY}_lock.key ${SSL_KEY}.key ${SSL_PEM}.pem
 	-rm NiaOrgImage/${SSL_KEY}_lock.key NiaOrgImage/${SSL_KEY}.key NiaOrgImage/${SSL_PEM}.pem
 
 build_clean:
-	docker image rm niaorg:${NIAORG_TAG}
+	docker image rm niaorg:${NIAORG_TAG}-python-${PYTHON_VERSION}
 
 create_net: volume
 	docker create --name=niaorg-server \
@@ -100,14 +100,14 @@ create_net: volume
 		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
-		-d niaorg:${NIAORG_TAG}
+		-d niaorg:${NIAORG_TAG}-python-${PYTHON_VERSION}
 
 create: volume
-	docker create --name niaorg-server \
+	docker create --name niaorg-server-python-${PYTHON_VERSION} \
 		--hostname niaorg \
 		-p ${NIAORG_SORCE_PORT}:9999 \
 		-v ${NIAORG_VOLUME_SRC}:/mnt/NiaOrg \
-		-d niaorg:${NIAORG_TAG}
+		-d niaorg:${NIAORG_TAG}-python-${PYTHON_VERSION}
 
 run: volume
 	docker run --rm -it \
@@ -128,20 +128,20 @@ run_net: volume
 		${EXEC_SHELL}
 
 start:
-	docker start niaorg-server
+	docker start niaorg-server-python-${PYTHON_VERSION}
 
 stop:
-	docker stop niaorg-server
+	docker stop niaorg-server-python-${PYTHON_VERSION}
 
 exec:
-	docker exec -it -u ${EXEC_USER} niaorg-server ${EXEC_SHELL}
+	docker exec -it -u ${EXEC_USER} niaorg-server-python-${PYTHON_VERSION} ${EXEC_SHELL}
 
 remove:
 	-make stop
-	docker container rm niaorg-server
+	docker container rm niaorg-server-python-${PYTHON_VERSION}
 	-make build_clean
 
 clean:
 	-make remove
-	docker image rm niaorg:${NIAORG_TAG}
+	docker image rm niaorg:${NIAORG_TAG}-python-${PYTHON_VERSION}
 
